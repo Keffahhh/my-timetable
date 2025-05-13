@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Schedule & Notifications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Use Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Simple transition for buttons */
+        button {
+            transition: background-color 0.2s ease-in-out;
+        }
+        /* Ensure select dropdowns have consistent styling */
+        select {
+            appearance: none; /* Remove default arrow */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007AFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 0.65rem auto;
+            padding-right: 2rem; /* Make space for arrow */
+        }
+         /* Style for the schedule table */
+        #scheduleTable th, #scheduleTable td {
+            border: 1px solid #e2e8f0; /* gray-200 */
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.8rem; /* Smaller font for table */
+            min-height: 40px; /* Minimum height for cells */
+            vertical-align: top;
+        }
+        #scheduleTable th {
+            background-color: #f1f5f9; /* gray-100 */
+        }
+        .lesson-entry {
+            background-color: #bfdbfe; /* blue-200 */
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin-bottom: 2px;
+            display: block; /* Make each lesson take a line */
+            font-size: 0.75rem; /* Even smaller font for lesson details */
+            word-break: break-word; /* Prevent long words from overflowing */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center text-blue-700">Teacher Schedule & Notifications</h1>
+
+        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
+            <h2 class="text-lg font-semibold mb-2 text-blue-800">Notifications</h2>
+            <p id="notification-status" class="text-sm text-gray-600 mb-3">Notifications status will appear here.</p>
+            <button id="enable-notifications" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
+                Enable Notifications
+            </button>
+            <p class="text-xs text-gray-500 mt-2">Note: Notifications work best when this page is open in your browser.</p>
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Add New Lesson</h2>
+            <form id="add-lesson-form" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-end">
+                <div>
+                    <label for="lesson-subject" class="block text-sm font-medium text-gray-700 mb-1">Subject/Activity</label>
+                    <input type="text" id="lesson-subject" name="subject" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" placeholder="e.g., Comp Form 2">
+                </div>
+                <div>
+                    <label for="lesson-day" class="block text-sm font-medium text-gray-700 mb-1">Day of Week</label>
+                    <select id="lesson-day" name="day" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white text-sm">
+                        <option value="1">Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3">Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                        <option value="0">Sunday</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="lesson-start-time" class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                    <input type="time" id="lesson-start-time" name="startTime" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm">
+                </div>
+                <div>
+                    <label for="lesson-end-time" class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                    <input type="time" id="lesson-end-time" name="endTime" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm">
+                </div>
+                <div class="sm:col-span-2 md:col-span-1">
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
+                        Add Lesson to Schedule
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Weekly Schedule</h2>
+            <div class="overflow-x-auto">
+                 <table id="scheduleTable" class="min-w-full border-collapse border border-gray-300 bg-white">
+                    <thead>
+                        <tr>
+                            <th class="w-1/8">Time</th>
+                            <th class="w-1/8">Monday</th>
+                            <th class="w-1/8">Tuesday</th>
+                            <th class="w-1/8">Wednesday</th>
+                            <th class="w-1/8">Thursday</th>
+                            <th class="w-1/8">Friday</th>
+                            <th class="w-1/8">Saturday</th>
+                            <th class="w-1/8">Sunday</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-body">
+                        </tbody>
+                </table>
+            </div>
+             <button id="clear-schedule" class="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm">
+                Clear Entire Schedule
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const addLessonForm = document.getElementById('add-lesson-form');
+        const scheduleBody = document.getElementById('schedule-body');
+        const enableNotificationsButton = document.getElementById('enable-notifications');
+        const notificationStatus = document.getElementById('notification-status');
+        const clearScheduleButton = document.getElementById('clear-schedule');
+        const scheduleTable = document.getElementById('scheduleTable');
+
+        const NOTIFICATION_LEAD_TIME_MINUTES = 5; // Show notification 5 minutes before lesson
+        let notificationInterval = null; // To store the interval timer
+
+        // --- Data Storage ---
+        function getLessons() {
+            // Retrieve lessons from localStorage or return an empty array
+            const lessonsJson = localStorage.getItem('teacherLessons');
+            return lessonsJson ? JSON.parse(lessonsJson) : [];
+        }
+
+        function saveLessons(lessons) {
+            // Save lessons array to localStorage
+            localStorage.setItem('teacherLessons', JSON.stringify(lessons));
+        }
+
+        // --- Schedule Display ---
+        function generateTimeSlots(startTime = '07:00', endTime = '18:00', interval = 30) {
+            const slots = [];
+            let current = new Date(`1970-01-01T${startTime}:00`);
+            const end = new Date(`1970-01-01T${endTime}:00`);
+
+            while (current <= end) {
+                slots.push(current.toTimeString().substring(0, 5)); // Format as HH:MM
+                current.setMinutes(current.getMinutes() + interval);
+            }
+            return slots;
+        }
+
+        function renderSchedule() {
+            const lessons = getLessons();
+            scheduleBody.innerHTML = ''; // Clear existing schedule rows
+
+            // Define time slots for the table rows (e.g., 7:00 AM to 6:00 PM)
+            const timeSlots = generateTimeSlots('07:00', '18:00', 30); // 30 min intervals
+
+            timeSlots.forEach(time => {
+                const row = scheduleBody.insertRow();
+                const timeCell = row.insertCell();
+                timeCell.textContent = time;
+                timeCell.classList.add('font-semibold', 'text-xs'); // Style time cell
+
+                // Create cells for each day (0=Sun, 1=Mon, ..., 6=Sat)
+                for (let dayIndex = 1; dayIndex <= 7; dayIndex++) { // Mon to Sun
+                    const cell = row.insertCell();
+                    cell.dataset.time = time;
+                    cell.dataset.day = dayIndex % 7; // Store day (0 for Sun, 1 for Mon...)
+
+                    // Find lessons that fall within this time slot for this day
+                    const lessonsInSlot = lessons.filter(lesson => {
+                        const lessonDay = parseInt(lesson.day);
+                        const cellDay = dayIndex % 7; // 1=Mon..6=Sat, 0=Sun
+
+                        // Check if the lesson's day matches the cell's day
+                        if (lessonDay !== cellDay) return false;
+
+                        // Check if the cell's time is within the lesson's start and end time
+                        // Note: This simple check places the lesson in the slot where it starts.
+                        // A more complex rendering could span multiple cells.
+                        const lessonStartTime = lesson.startTime;
+                        // This places the lesson description in the time slot *at or just after* the start time
+                        return lessonStartTime >= time && lessonStartTime < getNextTimeSlot(time, 30);
+
+                    });
+
+                    // Add lesson info to the cell
+                    lessonsInSlot.forEach(lesson => {
+                        const lessonDiv = document.createElement('div');
+                        lessonDiv.classList.add('lesson-entry');
+                        lessonDiv.textContent = `${lesson.subject} (${lesson.startTime}-${lesson.endTime})`;
+                        lessonDiv.title = `Click to remove: ${lesson.subject}`; // Tooltip
+
+                        // Add click event to remove the lesson
+                        lessonDiv.addEventListener('click', () => {
+                            if (confirm(`Remove lesson "${lesson.subject}" on ${getDayName(lesson.day)} at ${lesson.startTime}?`)) {
+                                removeLesson(lesson.id);
+                            }
+                        });
+                        cell.appendChild(lessonDiv);
+                    });
+                }
+            });
+        }
+
+        function getNextTimeSlot(time, interval) {
+             let [hours, minutes] = time.split(':').map(Number);
+             minutes += interval;
+             hours += Math.floor(minutes / 60);
+             minutes %= 60;
+             return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        }
+
+        function getDayName(dayIndex) {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            return days[parseInt(dayIndex)];
+        }
+
+
+        // --- Add Lesson ---
+        addLessonForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent page reload
+
+            const formData = new FormData(addLessonForm);
+            const newLesson = {
+                id: Date.now().toString(), // Simple unique ID
+                subject: formData.get('subject'),
+                day: formData.get('day'), // 0=Sun, 1=Mon, ...
+                startTime: formData.get('startTime'), // HH:MM format
+                endTime: formData.get('endTime'),
+                notified: false // Flag to track if notification was sent for this occurrence
+            };
+
+            // Basic validation
+            if (!newLesson.subject || !newLesson.day || !newLesson.startTime || !newLesson.endTime) {
+                alert('Please fill in all fields.');
+                return;
+            }
+            if (newLesson.endTime <= newLesson.startTime) {
+                 alert('End time must be after start time.');
+                 return;
+            }
+
+
+            const lessons = getLessons();
+            lessons.push(newLesson);
+            saveLessons(lessons);
+
+            renderSchedule(); // Update the displayed schedule
+            addLessonForm.reset(); // Clear the form
+            console.log('Lesson added:', newLesson);
+            checkNotifications(); // Re-check notifications immediately
+        });
+
+         // --- Remove Lesson ---
+        function removeLesson(lessonId) {
+            let lessons = getLessons();
+            lessons = lessons.filter(lesson => lesson.id !== lessonId);
+            saveLessons(lessons);
+            renderSchedule(); // Update the display
+            console.log('Lesson removed:', lessonId);
+        }
+
+        // --- Clear Schedule ---
+        clearScheduleButton.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear the entire schedule? This cannot be undone.')) {
+                saveLessons([]); // Save an empty array
+                renderSchedule(); // Re-render the empty schedule
+                console.log('Schedule cleared.');
+            }
+        });
+
+
+        // --- Notifications ---
+        function updateNotificationStatus(status, isError = false) {
+            notificationStatus.textContent = status;
+            notificationStatus.className = `text-sm mb-3 ${isError ? 'text-red-600' : 'text-gray-600'}`;
+             if (status.includes('granted')) {
+                 enableNotificationsButton.textContent = 'Notifications Enabled';
+                 enableNotificationsButton.disabled = true;
+                 enableNotificationsButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                 enableNotificationsButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+            } else {
+                 enableNotificationsButton.textContent = 'Enable Notifications';
+                 enableNotificationsButton.disabled = false;
+                 enableNotificationsButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                 enableNotificationsButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            }
+        }
+
+        function requestNotificationPermission() {
+            // Check if the browser supports notifications
+            if (!("Notification" in window)) {
+                updateNotificationStatus("This browser does not support desktop notifications.", true);
+                return;
+            }
+
+            // Check the current permission status
+            if (Notification.permission === "granted") {
+                updateNotificationStatus("Notification permission already granted.");
+                startNotificationChecker(); // Start checking if already granted
+            } else if (Notification.permission !== "denied") {
+                // Request permission
+                Notification.requestPermission().then((permission) => {
+                    if (permission === "granted") {
+                        updateNotificationStatus("Notification permission granted.");
+                        startNotificationChecker(); // Start checking now that it's granted
+                        // Optionally send a test notification
+                        new Notification("Notifications Enabled!", { body: "You will now receive lesson reminders." });
+                    } else {
+                        updateNotificationStatus("Notification permission denied.", true);
+                         stopNotificationChecker(); // Stop checking if denied
+                    }
+                });
+            } else {
+                 updateNotificationStatus("Notification permission was previously denied. Please enable it in your browser settings.", true);
+                 stopNotificationChecker(); // Stop checking if denied
+            }
+        }
+
+        function showNotification(lesson) {
+            if (Notification.permission !== "granted") return; // Double check permission
+
+            const notificationBody = `Your lesson "${lesson.subject}" starts at ${lesson.startTime}.`;
+            const notification = new Notification("Upcoming Lesson Reminder", {
+                body: notificationBody,
+                icon: 'https://placehold.co/48x48/007AFF/FFFFFF?text=🔔' // Simple bell icon placeholder
+            });
+
+            // Optional: Close notification automatically after some time
+            setTimeout(notification.close.bind(notification), 10000); // Close after 10 seconds
+        }
+
+        function checkNotifications() {
+            if (Notification.permission !== "granted") return; // Only run if permission granted
+
+            const now = new Date();
+            const currentDay = now.getDay(); // 0=Sun, 1=Mon, ...
+            const currentTime = now.toTimeString().substring(0, 5); // HH:MM
+
+            const lessons = getLessons();
+            let lessonsToSave = false; // Flag to check if we need to save updated 'notified' status
+
+            lessons.forEach(lesson => {
+                // Check if it's the right day
+                if (parseInt(lesson.day) !== currentDay) {
+                    // Reset notified flag if it's a new day (or past the lesson time)
+                    if (lesson.notified) {
+                        lesson.notified = false;
+                        lessonsToSave = true;
+                    }
+                    return; // Skip to next lesson if not today
+                }
+
+                // Calculate time difference in minutes
+                const [lessonHour, lessonMinute] = lesson.startTime.split(':').map(Number);
+                const lessonTimeToday = new Date(now);
+                lessonTimeToday.setHours(lessonHour, lessonMinute, 0, 0);
+
+                const diffMinutes = (lessonTimeToday - now) / (1000 * 60);
+
+                 // Check if the lesson is upcoming within the lead time and hasn't been notified yet
+                if (diffMinutes > 0 && diffMinutes <= NOTIFICATION_LEAD_TIME_MINUTES && !lesson.notified) {
+                    console.log(`Showing notification for: ${lesson.subject} at ${lesson.startTime}`);
+                    showNotification(lesson);
+                    lesson.notified = true; // Mark as notified for this occurrence
+                    lessonsToSave = true;
+                }
+                // Reset notified flag if the lesson time has passed significantly (e.g., end time passed)
+                else if (lesson.notified) {
+                     const [endHour, endMinute] = lesson.endTime.split(':').map(Number);
+                     const lessonEndTimeToday = new Date(now);
+                     lessonEndTimeToday.setHours(endHour, endMinute, 0, 0);
+                     if (now > lessonEndTimeToday) {
+                         lesson.notified = false; // Reset for the next occurrence
+                         lessonsToSave = true;
+                         console.log(`Resetting notified status for passed lesson: ${lesson.subject}`);
+                     }
+                }
+            });
+
+             // Save lessons only if a notified status was changed
+            if (lessonsToSave) {
+                saveLessons(lessons);
+            }
+        }
+
+        function startNotificationChecker() {
+             if (Notification.permission !== "granted") {
+                 console.log("Notification permission not granted. Checker not started.");
+                 return;
+             }
+             if (notificationInterval) {
+                clearInterval(notificationInterval); // Clear existing interval if any
+             }
+             console.log("Starting notification checker (every 60 seconds)");
+             checkNotifications(); // Check immediately
+             notificationInterval = setInterval(checkNotifications, 60000); // Check every 60 seconds
+        }
+
+        function stopNotificationChecker() {
+            if (notificationInterval) {
+                clearInterval(notificationInterval);
+                notificationInterval = null;
+                console.log("Stopped notification checker.");
+            }
+        }
+
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSchedule(); // Display schedule on page load
+
+            // Check initial notification status but don't request permission automatically
+             if (!("Notification" in window)) {
+                updateNotificationStatus("This browser does not support desktop notifications.", true);
+            } else if (Notification.permission === "granted") {
+                 updateNotificationStatus("Notification permission already granted.");
+                 startNotificationChecker(); // Start checking if already granted
+            } else if (Notification.permission === "denied") {
+                updateNotificationStatus("Notifications are denied. Please enable in browser settings.", true);
+            } else {
+                 updateNotificationStatus("Notifications are not enabled. Click the button above.");
+            }
+
+             // Add event listener for the button
+            enableNotificationsButton.addEventListener('click', requestNotificationPermission);
+        });
+
+    </script>
+</body>
+</html>
